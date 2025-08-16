@@ -1,0 +1,16 @@
+package com.chatdoc.chatwithpdf.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel; // interface implemented by OpenAiChatModel
+
+@Configuration
+public class AiConfig {
+
+    @Bean
+    public ChatClient chatClient(ChatModel chatModel) {
+        // builds a fluent ChatClient backed by the auto-configured ChatModel
+        return ChatClient.create(chatModel);
+    }
+}
