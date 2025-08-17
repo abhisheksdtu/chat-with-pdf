@@ -31,7 +31,6 @@ public class ChatWithPdfApplication {
         String base = "http://localhost:" + port + contextPath;
         String swaggerUrl = base + "/swagger-ui/index.html";
 
-        // ✅ uses Lombok-provided log
         log.info("\n----------------------------------------------------------\n" +
                 "  Application is ready!\n" +
                 "  Swagger UI: {}\n" +

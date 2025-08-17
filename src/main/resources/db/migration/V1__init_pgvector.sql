@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS doc_chunks (
                                           file_name TEXT,
                                           page_number INT,
                                           content TEXT NOT NULL,
-                                          embedding vector(1536)  -- set to your embedding dim
+                                          embedding vector(1536)
     );
 
 CREATE INDEX IF NOT EXISTS doc_chunks_embedding_idx ON doc_chunks
