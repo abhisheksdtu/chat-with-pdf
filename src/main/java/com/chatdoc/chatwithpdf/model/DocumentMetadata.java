@@ -1,11 +1,7 @@
 package com.chatdoc.chatwithpdf.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -21,8 +17,17 @@ public class DocumentMetadata {
     private Long id;
 
     private String fileName;
+
     private long fileSize;
+
     private LocalDateTime uploadTime;
+
     private Integer pageCount;
+
     private String s3Key;
+
+    @Enumerated(EnumType.STRING)
+    private DocumentChunkingAndEmbeddingStatus status;
+
+    private String errorMessage;
 }

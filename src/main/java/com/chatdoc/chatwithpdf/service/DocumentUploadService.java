@@ -1,16 +1,19 @@
 package com.chatdoc.chatwithpdf.service;
 
+import com.chatdoc.chatwithpdf.events.DocumentChunkingAndEmbeddingEvent;
+import com.chatdoc.chatwithpdf.messaging.DocumentChunkingAndEmbeddingProducer;
+import com.chatdoc.chatwithpdf.model.DocumentChunkingAndEmbeddingStatus;
 import com.chatdoc.chatwithpdf.model.DocumentMetadata;
-import com.chatdoc.chatwithpdf.model.PageText;
 import com.chatdoc.chatwithpdf.model.S3UploadResult;
 import com.chatdoc.chatwithpdf.repository.DocumentMetadataRepository;
-import com.chatdoc.chatwithpdf.util.PdfUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +22,9 @@ public class DocumentUploadService {
     private final ChunkingService chunkingService;
     private final VectorStoreService vectorStoreService;
     private final S3StorageService s3StorageService;
+    private final DocumentChunkingAndEmbeddingProducer documentChunkingAndEmbeddingProducer;
+
+    @Value("${app.s3.bucket}") String bucket;
 
     public Long processAndStoreDocuments(MultipartFile file) throws IOException {
         if (!file.getOriginalFilename().endsWith(".pdf")) {
@@ -30,29 +36,41 @@ public class DocumentUploadService {
                 DocumentMetadata.builder()
                         .fileName(file.getOriginalFilename())
                         .fileSize(file.getSize())
-                        .uploadTime(java.time.LocalDateTime.now())
+                        .uploadTime(OffsetDateTime.now(ZoneOffset.UTC).toLocalDateTime())
+                        .status(DocumentChunkingAndEmbeddingStatus.QUEUED)
                         .s3Key(uploaded.getKey())
                         .build()
         );
 
-        List<PageText> pages = PdfUtils.extractText(file);
+        DocumentChunkingAndEmbeddingEvent documentChunkingAndEmbeddingEvent = new DocumentChunkingAndEmbeddingEvent(
+                documentMetadata.getId(),
+                uploaded.getBucket(),
+                uploaded.getKey(),
+                uploaded.getContentType(),
+                uploaded.getSize()
+        );
 
-        if (documentMetadata.getPageCount() == null) {
-            documentMetadata.setPageCount(pages.size());
-            documentMetadataRepository.save(documentMetadata);
-        }
+        documentChunkingAndEmbeddingProducer.send(documentChunkingAndEmbeddingEvent);
 
-        for (PageText page : pages) {
-            List<String> chunks = chunkingService.chunk(page.getText());
-            if (!chunks.isEmpty()) {
-                vectorStoreService.addChunks(
-                        file.getOriginalFilename(),
-                        chunks,
-                        documentMetadata.getId(),
-                        page.getPageNumber()
-                );
-            }
-        }
+
+//        List<PageText> pages = PdfUtils.extractText(file);
+//
+//        if (documentMetadata.getPageCount() == null) {
+//            documentMetadata.setPageCount(pages.size());
+//            documentMetadataRepository.save(documentMetadata);
+//        }
+//
+//        for (PageText page : pages) {
+//            List<String> chunks = chunkingService.chunk(page.getText());
+//            if (!chunks.isEmpty()) {
+//                vectorStoreService.addChunks(
+//                        file.getOriginalFilename(),
+//                        chunks,
+//                        documentMetadata.getId(),
+//                        page.getPageNumber()
+//                );
+//            }
+//        }
 
 //        var chunks = chunkingService.chunk(text);
 //        vectorStoreService.addChunks(file.getOriginalFilename(), chunks, documentMetadata.getId());

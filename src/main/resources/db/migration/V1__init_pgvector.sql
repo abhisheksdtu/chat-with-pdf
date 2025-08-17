@@ -14,3 +14,8 @@ CREATE TABLE IF NOT EXISTS doc_chunks (
 CREATE INDEX IF NOT EXISTS doc_chunks_embedding_idx ON doc_chunks
     USING ivfflat (embedding vector_cosine_ops)
     WITH (lists = 100);
+
+
+ALTER TABLE document_metadata
+    ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'QUEUED',
+    ADD COLUMN IF NOT EXISTS error_message TEXT;
