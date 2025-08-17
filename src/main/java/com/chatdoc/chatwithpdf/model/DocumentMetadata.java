@@ -24,4 +24,5 @@ public class DocumentMetadata {
     private long fileSize;
     private LocalDateTime uploadTime;
     private Integer pageCount;
+    private String s3Key;
 }
