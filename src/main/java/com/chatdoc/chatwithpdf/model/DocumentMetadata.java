@@ -23,4 +23,5 @@ public class DocumentMetadata {
     private String fileName;
     private long fileSize;
     private LocalDateTime uploadTime;
+    private Integer pageCount;
 }

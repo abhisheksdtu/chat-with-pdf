@@ -15,14 +15,14 @@ public class VectorStoreService {
 
     private final PgVectorStore vectorStore;
 
-    public void addChunks(String fileName, List<String> chunks, Long documentId) {
+    public void addChunks(String fileName, List<String> chunks, Long documentId, Integer pageNumber) {
         List<Document> docs = chunks.stream()
                 .map(t -> new Document(
                         t,
                         Map.of(
                                 "fileName", fileName,
-                                "documentId", String.valueOf(documentId)
-                                // include "pageNumber" in metadata when you add it
+                                "documentId", String.valueOf(documentId),
+                                "pageNumebr", String.valueOf(pageNumber)
                         )))
                 .toList();
         vectorStore.add(docs);
