@@ -22,7 +22,7 @@ public class VectorStoreService {
                         Map.of(
                                 "fileName", fileName,
                                 "documentId", String.valueOf(documentId),
-                                "pageNumebr", String.valueOf(pageNumber)
+                                "pageNumber", String.valueOf(pageNumber)
                         )))
                 .toList();
         vectorStore.add(docs);
