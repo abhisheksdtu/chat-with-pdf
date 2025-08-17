@@ -1,6 +1,7 @@
 package com.chatdoc.chatwithpdf.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VectorStoreService {
@@ -16,6 +18,7 @@ public class VectorStoreService {
     private final PgVectorStore vectorStore;
 
     public void addChunks(String fileName, List<String> chunks, Long documentId, Integer pageNumber) {
+        log.debug("Adding chunks");
         List<Document> docs = chunks.stream()
                 .map(t -> new Document(
                         t,

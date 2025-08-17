@@ -1,10 +1,12 @@
 package com.chatdoc.chatwithpdf.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class ChunkingService {
 
@@ -13,6 +15,7 @@ public class ChunkingService {
     private static final int CHUNK_OVERLAP = 200;
 
     public List<String> chunk(String text) {
+        log.debug("Chunking text");
         List<String> chunks = new ArrayList<>();
         if (text == null || text.isBlank()) return chunks;
 

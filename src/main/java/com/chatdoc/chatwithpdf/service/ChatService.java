@@ -6,6 +6,7 @@ import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +69,21 @@ public class ChatService {
                 .call()
                 .content();
 
-        return new Answer(reply, citations);
+        LinkedHashSet<Citation> uniqueCitations = new LinkedHashSet<>(citations);
+        StringBuilder citationBlock = new StringBuilder();
+        if (!uniqueCitations.isEmpty()) {
+            citationBlock.append("\n\nSources:\n");
+            for (Citation c : uniqueCitations) {
+                if (c.pageNumber() != null) {
+                    citationBlock.append("- Page ").append(c.pageNumber())
+                            .append(", ").append(c.fileName()).append("\n");
+                } else {
+                    citationBlock.append("- ").append(c.fileName()).append("\n");
+                }
+            }
+        }
+
+        return new Answer(reply + citationBlock.toString(), new ArrayList<>(uniqueCitations));
     }
 
     public record Citation(String fileName, String pageNumber) {
